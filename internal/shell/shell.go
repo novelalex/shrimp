@@ -28,23 +28,32 @@ func (shell *Shell) REPL() {
 	for shell.IsRunning {
 		fmt.Fprint(os.Stdout, "$ ")
 
-		raw_command, err := reader.ReadString('\n')
+		rawCmd, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "error reading input: ", err)
 		}
 
 		// remove newline (and carriage return on windows i guess)
-		command_string := strings.TrimSpace(raw_command)
-		command_list := strings.Fields(command_string)
-		command := command_list[0]
-		args := command_list[1:]
+		cmdString := strings.TrimSpace(rawCmd)
 
-		if command == "exit" {
-			builtins.Exit(shell, args)
-		} else if command == "echo" {
-			builtins.Echo(shell, args)
+		cmd, args := splitCommandAndArgs(cmdString)
+
+		if builtinFunction, ok := builtins.BuiltIns[cmd]; ok {
+			out, err := builtinFunction(shell, args)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error running %s command: %s\n", cmd, err)
+			}
+			fmt.Fprintf(os.Stdout, "%s\n", out)
+
 		} else {
-			fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+			fmt.Fprintf(os.Stdout, "%s: command not found\n", cmd)
 		}
 	}
+}
+
+func splitCommandAndArgs(cmdString string) (cmd string, args []string) {
+	cmdList := strings.Fields(cmdString)
+	cmd = cmdList[0]
+	args = cmdList[1:]
+	return cmd, args
 }

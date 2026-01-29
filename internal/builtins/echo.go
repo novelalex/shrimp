@@ -1,20 +1,23 @@
 package builtins
 
 import (
+	"bytes"
 	"fmt"
-	"os"
 
-	"github.com/novelalex/shrimp/internal/api"
+	"github.com/novelalex/shrimp/internal/context"
 )
 
-func Echo(shell api.Context, args []string) {
+func Echo(shell context.Context, args []string) (output string, err error) {
+	var buffer bytes.Buffer
+
 	for i, arg := range args {
-		fmt.Fprint(os.Stdout, arg)
+		fmt.Fprint(&buffer, arg)
 
 		// put spaces after all args except last
 		if i < len(args)-1 {
-			fmt.Fprint(os.Stdout, " ")
+			fmt.Fprint(&buffer, " ")
 		}
 	}
-	fmt.Fprint(os.Stdout, "\n")
+
+	return buffer.String(), nil
 }

@@ -2,6 +2,8 @@ package builtins
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/novelalex/shrimp/internal/context"
 )
@@ -9,6 +11,12 @@ import (
 func Type(shell context.Context, args []string) (output string, err error) {
 	usageString := "usage: type <command>"
 	expectedArgCount := 1
+	pathString := os.Getenv("PATH")
+	paths := strings.Split(pathString, string(os.PathListSeparator))
+
+	for _, path := range paths {
+
+	}
 
 	if len(args) != expectedArgCount {
 		return usageString, fmt.Errorf("Incorrect number of args provided: expected %d, got %d", expectedArgCount, len(args))

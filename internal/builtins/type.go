@@ -3,19 +3,17 @@ package builtins
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/novelalex/shrimp/internal/context"
+	"github.com/novelalex/shrimp/internal/fileutil"
 )
 
 func Type(shell context.Context, args []string) (output string, err error) {
 	usageString := "usage: type <command>"
 	expectedArgCount := 1
-	pathString := os.Getenv("PATH")
-	paths := strings.Split(pathString, string(os.PathListSeparator))
-
-	for _, path := range paths {
-
+	executablesInPath, err := fileutil.ExecutablesInPath(os.Getenv("PATH"))
+	if err != nil {
+		return "", err
 	}
 
 	if len(args) != expectedArgCount {
@@ -26,6 +24,8 @@ func Type(shell context.Context, args []string) (output string, err error) {
 
 	if _, ok := BuiltInCmdMap[cmd]; ok {
 		output = fmt.Sprintf("%s is a shell builtin", cmd)
+	} else if _, ok := executablesInPath[cmd]; ok {
+		output = fmt.Sprintf("%s is %s", cmd, executablesInPath[cmd])
 	} else {
 		output = fmt.Sprintf("%s: not found", cmd)
 	}

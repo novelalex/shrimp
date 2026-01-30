@@ -10,7 +10,8 @@ import (
 )
 
 type Shell struct {
-	IsRunning bool
+	ExecutablesInPath map[string]string
+	IsRunning         bool
 }
 
 func (s *Shell) SetIsRunning(b bool) {
